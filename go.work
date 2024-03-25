@@ -1,6 +1,8 @@
 go 1.22.0
 
 use (
+	./gocontext
 	./goreflection
+	./goroman_numerals/v1
 	./gosync
 )
