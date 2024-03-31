@@ -4,5 +4,6 @@ use (
 	./gocontext
 	./goreflection
 	./goroman_numerals/v1
+	./goroman_numerals/v2
 	./gosync
 )
