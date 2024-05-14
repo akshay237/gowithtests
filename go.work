@@ -2,6 +2,8 @@ go 1.22.0
 
 use (
 	./gocontext
+	./gofiles/version1
+	./gomath/v1/clockface
 	./goreflection
 	./goroman_numerals/v1
 	./goroman_numerals/v2
