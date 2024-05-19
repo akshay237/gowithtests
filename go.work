@@ -3,6 +3,7 @@ go 1.22.0
 use (
 	./gocontext
 	./gofiles/version1
+	./gofiles/version2
 	./gomath/v1/clockface
 	./goreflection
 	./goroman_numerals/v1

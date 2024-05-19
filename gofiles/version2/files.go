@@ -1,10 +1,20 @@
-package version1
+package version2
 
 import (
+	"bufio"
+	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
+	"strings"
 	"testing/fstest"
+)
+
+const (
+	titleSeprator       = "Title: "
+	descriptionSeprator = "Description: "
+	tagsSeprator        = "Tags: "
 )
 
 type Post struct {
@@ -30,22 +40,6 @@ func NewPostsFromFS(fileSystem fstest.MapFS) ([]Post, error) {
 	return posts, nil
 }
 
-// Refactor it two funcs getPost and newPost and pass more sensful arguments
-// func getPost(fileSystem fs.FS, f fs.DirEntry) (Post, error) {
-// 	postFile, err := fileSystem.Open(f.Name())
-// 	if err != nil {
-// 		return Post{}, err
-// 	}
-// 	defer postFile.Close()
-
-// 	postData, err := io.ReadAll(postFile)
-// 	if err != nil {
-// 		return Post{}, err
-// 	}
-// 	post := Post{Title: string(postData[7:])}
-// 	return post, nil
-// }
-
 // The function `getPost` opens a file from a file system and returns a `Post` object along with any
 // errors encountered.
 func getPost(fileSystem fs.FS, fileName string) (Post, error) {
@@ -60,12 +54,34 @@ func getPost(fileSystem fs.FS, fileName string) (Post, error) {
 // The function `newPost` reads a post file, extracts the title from the content, and returns a `Post`
 // struct along with any errors encountered.
 func newPost(postFile io.Reader) (Post, error) {
-	postData, err := io.ReadAll(postFile)
-	if err != nil {
-		return Post{}, err
+	scanner := bufio.NewScanner(postFile)
+
+	// scanner.Scan()
+	// titleLine := scanner.Text()
+	// scanner.Scan()
+	// descriptionLine := scanner.Text()
+
+	// refactor above piece
+	readLine := func(tagName string) string {
+		scanner.Scan()
+		return strings.TrimPrefix(scanner.Text(), tagName)
 	}
-	post := Post{Title: string(postData[7:])}
-	return post, nil
+
+	readBody := func(bodyScanner *bufio.Scanner) string {
+		bodyScanner.Scan()
+		buff := bytes.Buffer{}
+		for bodyScanner.Scan() {
+			fmt.Fprintln(&buff, bodyScanner.Text())
+		}
+		return strings.TrimSuffix(buff.String(), "\n")
+	}
+
+	title := readLine(titleSeprator)
+	description := readLine(descriptionSeprator)
+	tags := strings.Split(readLine(tagsSeprator), ",")
+	body := readBody(scanner)
+
+	return Post{Title: title, Description: description, Tags: tags, Body: body}, nil
 }
 
 type StubFailingFS struct {
