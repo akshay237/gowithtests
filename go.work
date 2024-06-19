@@ -1,4 +1,4 @@
-go 1.22.0
+go 1.22.2
 
 use (
 	./gocontext
@@ -9,4 +9,5 @@ use (
 	./goroman_numerals/v1
 	./goroman_numerals/v2
 	./gosync
+	./gotemplating
 )
