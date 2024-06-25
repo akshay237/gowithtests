@@ -10,4 +10,5 @@ use (
 	./goroman_numerals/v2
 	./gosync
 	./gotemplating
+	./webapp/httpserver/version1
 )
