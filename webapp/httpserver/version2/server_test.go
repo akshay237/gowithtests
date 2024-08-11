@@ -7,20 +7,26 @@ import (
 	"testing"
 )
 
-// type Handler interface {
-// 	ServeHTTP(ResponseWriter, *Request)
-// }
-
 type StubPlayerStore struct {
-	scores map[string]int
+	scores   map[string]int
+	winCalls []string
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
 	return s.scores[name]
 }
 
+func (s *StubPlayerStore) RecordWin(name string) {
+	s.winCalls = append(s.winCalls, name)
+}
+
 func newGetScoreRequest(name string) *http.Request {
 	request, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", name), nil)
+	return request
+}
+
+func newPostWinRequest(name string) *http.Request {
+	request, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("/players/%s", name), nil)
 	return request
 }
 
@@ -44,6 +50,7 @@ func TestGetPlayers(t *testing.T) {
 			"ram":   20,
 			"flyod": 10,
 		},
+		nil,
 	}
 	server := &PlayerServer{&store}
 
@@ -107,5 +114,24 @@ func TestGetPlayers(t *testing.T) {
 		got := response.Code
 		want := http.StatusNotFound
 		assertStatus(t, got, want)
+	})
+}
+
+func TestStoreWins(t *testing.T) {
+	store := StubPlayerStore{
+		scores:   map[string]int{},
+		winCalls: nil,
+	}
+	server := &PlayerServer{&store}
+
+	t.Run("it returns accepted on POST", func(t *testing.T) {
+		request := newPostWinRequest("shyam")
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, request)
+		assertStatus(t, response.Code, http.StatusAccepted)
+
+		if len(store.winCalls) != 1 {
+			t.Errorf("got %d calls to record the win but want %d", len(store.winCalls), 1)
+		}
 	})
 }

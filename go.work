@@ -11,4 +11,5 @@ use (
 	./gosync
 	./gotemplating
 	./webapp/httpserver/version1
+	./webapp/httpserver/version2
 )
