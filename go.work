@@ -12,4 +12,5 @@ use (
 	./gotemplating
 	./webapp/httpserver/version1
 	./webapp/httpserver/version2
+	./webapp/json_embedding
 )
