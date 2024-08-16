@@ -1,10 +1,26 @@
 package main
 
 import (
-	"io"
+	"encoding/json"
 	"os"
 	"testing"
 )
+
+func createTempFile(t testing.TB, initialData string) (*os.File, func()) {
+	t.Helper()
+	tempfile, err := os.CreateTemp(".", "db")
+	if err != nil {
+		t.Fatalf("could not create temp file %v", err)
+	}
+
+	tempfile.Write([]byte(initialData))
+	removeFile := func() {
+		tempfile.Close()
+		os.Remove(tempfile.Name())
+	}
+
+	return tempfile, removeFile
+}
 
 func assertScore(t testing.TB, got, want int) {
 	t.Helper()
@@ -22,7 +38,7 @@ func TestFileSystemStore(t *testing.T) {
 		]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database: database}
+		store := NewFileSystemPlayerStore(database)
 		got := store.GetLeague()
 		want := []Player{
 			{"Cleo", 10},
@@ -46,7 +62,7 @@ func TestFileSystemStore(t *testing.T) {
 		]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database: database}
+		store := NewFileSystemPlayerStore(database)
 		got := store.GetPlayerScore("Chris")
 		want := 20
 		assertScore(t, got, want)
@@ -59,7 +75,7 @@ func TestFileSystemStore(t *testing.T) {
 		]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database: database}
+		store := NewFileSystemPlayerStore(database)
 		store.RecordWin("Chris")
 		got := store.GetPlayerScore("Chris")
 		want := 21
@@ -73,27 +89,11 @@ func TestFileSystemStore(t *testing.T) {
 		]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database: database}
+		store := FileSystemPlayerStore{database: json.NewEncoder(database)}
 		store.RecordWin("Ram")
 
 		got := store.GetPlayerScore("Ram")
 		want := 1
 		assertScore(t, got, want)
 	})
-}
-
-func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
-	t.Helper()
-	tempfile, err := os.CreateTemp("./", "db")
-	if err != nil {
-		t.Fatalf("could not create temp file %v", err)
-	}
-
-	tempfile.Write([]byte(initialData))
-	removeFile := func() {
-		tempfile.Close()
-		os.Remove(tempfile.Name())
-	}
-
-	return tempfile, removeFile
 }
