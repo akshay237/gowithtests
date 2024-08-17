@@ -10,11 +10,12 @@ use (
 	./goroman_numerals/v2
 	./gosync
 	./gotemplating
+	./webapp/command_line/v1
+	./webapp/command_line/v2
 	./webapp/httpserver/version1
 	./webapp/httpserver/version2
 	./webapp/io_sorting/version1
 	./webapp/io_sorting/version2
 	./webapp/io_sorting/version3
-	./webapp/command_line/v1
 	./webapp/json_embedding
 )
