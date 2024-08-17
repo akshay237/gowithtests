@@ -15,5 +15,6 @@ use (
 	./webapp/io_sorting/version1
 	./webapp/io_sorting/version2
 	./webapp/io_sorting/version3
+	./webapp/command_line/v1
 	./webapp/json_embedding
 )
